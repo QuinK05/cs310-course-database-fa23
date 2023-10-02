@@ -1,5 +1,6 @@
 package edu.jsu.mcis.cs310.coursedb.dao;
 
+import com.github.cliftonlabs.json_simple.JsonArray;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,7 +9,8 @@ import java.sql.Statement;
 
 public class RegistrationDAO {
     
-    // INSERT YOUR CODE HERE
+     private final String QUERY_CREATE = "INSERT INTO registration (studentid, termid, crn) VALUES (?, ?, ?)";
+     private final String QUERY_LIST = "SELECT * FROM registration WHERE studentid = ? AND termid = ?";
     
     private final DAOFactory daoFactory;
     
@@ -29,7 +31,12 @@ public class RegistrationDAO {
             
             if (conn.isValid(0)) {
                 
-                // INSERT YOUR CODE HERE
+                ps = conn.prepareStatement(QUERY_CREATE, Statement.RETURN_GENERATED_KEYS);
+                ps.setInt(1, studentid);
+                ps.setInt(2, termid);
+                ps.setInt(3, crn);
+                 
+                  result = ps.executeUpdate() != 0;
                 
             }
             
@@ -52,6 +59,9 @@ public class RegistrationDAO {
         
         boolean result = false;
         
+        int keys;
+        String query;
+        
         PreparedStatement ps = null;
         
         try {
@@ -60,7 +70,14 @@ public class RegistrationDAO {
             
             if (conn.isValid(0)) {
                 
-                // INSERT YOUR CODE HERE
+               query = "DELETE FROM registration WHERE studentid = ? AND termid = ? AND crn = ?";
+               ps = conn.prepareStatement(query);
+               ps.setInt(1, studentid);
+               ps.setInt(2, termid);
+               ps.setInt(3, crn);
+               
+               result = ps.executeUpdate() != 0;
+                
                 
             }
             
@@ -82,6 +99,9 @@ public class RegistrationDAO {
         
         boolean result = false;
         
+        int keys;
+        String query;
+        
         PreparedStatement ps = null;
         
         try {
@@ -89,6 +109,13 @@ public class RegistrationDAO {
             Connection conn = daoFactory.getConnection();
             
             if (conn.isValid(0)) {
+                
+                query = "DELETE FROM registration WHERE studentid = ? AND termid = ?";
+                ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+                ps.setInt(1, studentid);
+                ps.setInt(2, termid);
+                
+                result = ps.executeUpdate() != 0;
                 
                 // INSERT YOUR CODE HERE
                 
@@ -112,6 +139,9 @@ public class RegistrationDAO {
         
         String result = "[]";
         
+        boolean hasResults;
+        JsonArray jsonArray = new JsonArray();
+        
         PreparedStatement ps = null;
         ResultSet rs = null;
         ResultSetMetaData rsmd = null;
@@ -122,7 +152,20 @@ public class RegistrationDAO {
             
             if (conn.isValid(0)) {
                 
-                // INSERT YOUR CODE HERE
+                ps = conn.prepareStatement(QUERY_LIST);
+                ps.setInt(1, studentid);
+                ps.setInt(2, termid);
+                
+                hasResults = ps.execute();
+                
+                if(hasResults){
+                    rs = ps.getResultSet();
+                    result = DAOUtility.getResultSetAsJson(rs);
+                }
+                
+                else {
+                    System.err.println("Error: No data returned");
+                }   
                 
             }
             

@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import com.github.cliftonlabs.json_simple.*;
 
 public class SectionDAO {
     
@@ -19,6 +20,9 @@ public class SectionDAO {
         
         String result = "[]";
         
+        String query;
+        boolean hasResults;
+        
         PreparedStatement ps = null;
         ResultSet rs = null;
         ResultSetMetaData rsmd = null;
@@ -29,7 +33,27 @@ public class SectionDAO {
             
             if (conn.isValid(0)) {
                 
-                // INSERT YOUR CODE HERE
+                query = "SELECT * FROM section WHERE termid = ? AND subjectid = ? AND num = ?";
+                
+                ps = conn.prepareStatement(query);
+                ps.setInt(1, termid);
+                ps.setString(2, subjectid);
+                ps.setString(3, num);
+                
+                hasResults = ps.execute();
+                System.out.println("Getting Results");
+                
+                if(hasResults){
+                    
+                    rs = ps.getResultSet();
+                    result = DAOUtility.getResultSetAsJson(rs);
+                }
+                
+                else {
+                    System.err.println("ERROR: No data returned!");
+                }
+                
+
                 
             }
             
